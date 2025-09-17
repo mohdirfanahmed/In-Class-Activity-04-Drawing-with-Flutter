@@ -15,10 +15,7 @@ class EmojiApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Emoji Drawing App',
-      theme: ThemeData(
-        useMaterial3: true,
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(useMaterial3: true, primarySwatch: Colors.blue),
       home: const EmojiHomePage(),
     );
   }
@@ -37,9 +34,7 @@ class _EmojiHomePageState extends State<EmojiHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Interactive Emoji Drawing"),
-      ),
+      appBar: AppBar(title: const Text("Interactive Emoji Drawing")),
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
@@ -54,7 +49,10 @@ class _EmojiHomePageState extends State<EmojiHomePage> {
             DropdownButton<String>(
               value: selectedEmoji,
               items: const [
-                DropdownMenuItem(value: "Party Face", child: Text("Party Face 🎉")),
+                DropdownMenuItem(
+                  value: "Party Face",
+                  child: Text("Party Face 🎉"),
+                ),
                 DropdownMenuItem(value: "Heart", child: Text("Heart ❤️")),
               ],
               onChanged: (value) {
@@ -135,8 +133,10 @@ class EmojiPainter extends CustomPainter {
       final confettiPaint = Paint()
         ..color = Colors.primaries[random.nextInt(Colors.primaries.length)];
       canvas.drawCircle(
-        Offset(center.dx - 120 + random.nextDouble() * 240,
-            center.dy - 120 + random.nextDouble() * 240),
+        Offset(
+          center.dx - 120 + random.nextDouble() * 240,
+          center.dy - 120 + random.nextDouble() * 240,
+        ),
         4,
         confettiPaint,
       );
@@ -144,15 +144,27 @@ class EmojiPainter extends CustomPainter {
   }
 
   void _drawHeart(Canvas canvas, Size size) {
-    // Heart 
+    // Heart
     final center = Offset(size.width / 2, size.height / 2);
 
     final heartPath = Path();
     heartPath.moveTo(center.dx, center.dy + 40);
-    heartPath.cubicTo(center.dx + 80, center.dy - 20, center.dx + 40,
-        center.dy - 120, center.dx, center.dy - 40);
-    heartPath.cubicTo(center.dx - 40, center.dy - 120, center.dx - 80,
-        center.dy - 20, center.dx, center.dy + 40);
+    heartPath.cubicTo(
+      center.dx + 80,
+      center.dy - 20,
+      center.dx + 40,
+      center.dy - 120,
+      center.dx,
+      center.dy - 40,
+    );
+    heartPath.cubicTo(
+      center.dx - 40,
+      center.dy - 120,
+      center.dx - 80,
+      center.dy - 20,
+      center.dx,
+      center.dy + 40,
+    );
 
     final heartPaint = Paint()
       ..shader = LinearGradient(
