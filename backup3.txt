@@ -1,0 +1,153 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const EmojiDrawApp());
+}
+
+class EmojiDrawApp extends StatelessWidget {
+  const EmojiDrawApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Interactive Emoji Drawing',
+      theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
+      home: const EmojiHomePage(),
+    );
+  }
+}
+
+class EmojiHomePage extends StatefulWidget {
+  const EmojiHomePage({super.key});
+
+  @override
+  State<EmojiHomePage> createState() => _EmojiHomePageState();
+}
+
+class _EmojiHomePageState extends State<EmojiHomePage> {
+  String selectedEmoji = "Smiley Face";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Emoji Drawing App")),
+      body: Column(
+        children: [
+          // Dropdown menu to select emoji
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: DropdownButton<String>(
+              value: selectedEmoji,
+              items: const [
+                DropdownMenuItem(value: "Smiley Face", child: Text("😀 Smiley Face")),
+                DropdownMenuItem(value: "Party Face", child: Text("🥳 Party Face")),
+                DropdownMenuItem(value: "Heart", child: Text("❤️ Heart")),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedEmoji = value!;
+                });
+              },
+            ),
+          ),
+          // Drawing canvas
+          Expanded(
+            child: CustomPaint(
+              painter: EmojiPainter(selectedEmoji),
+              child: Container(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EmojiPainter extends CustomPainter {
+  final String emojiType;
+  EmojiPainter(this.emojiType);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    switch (emojiType) {
+      case "Smiley Face":
+        _drawSmileyFace(canvas, center);
+        break;
+      case "Party Face":
+        _drawPartyFace(canvas, center);
+        break;
+      case "Heart":
+        _drawHeart(canvas, center);
+        break;
+    }
+  }
+
+  void _drawSmileyFace(Canvas canvas, Offset center) {
+    final paint = Paint()..color = Colors.yellow..style = PaintingStyle.fill;
+    canvas.drawCircle(center, 100, paint);
+
+    final eyePaint = Paint()..color = Colors.black;
+    canvas.drawCircle(Offset(center.dx - 35, center.dy - 30), 15, eyePaint);
+    canvas.drawCircle(Offset(center.dx + 35, center.dy - 30), 15, eyePaint);
+
+    final smilePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6;
+    canvas.drawArc(Rect.fromCircle(center: center, radius: 70), 0.1 * pi, 0.8 * pi, false, smilePaint);
+  }
+
+  void _drawPartyFace(Canvas canvas, Offset center) {
+    // Base face
+    final facePaint = Paint()..color = Colors.yellow;
+    canvas.drawCircle(center, 100, facePaint);
+
+    // Eyes
+    final eyePaint = Paint()..color = Colors.black;
+    canvas.drawCircle(Offset(center.dx - 35, center.dy - 30), 15, eyePaint);
+    canvas.drawCircle(Offset(center.dx + 35, center.dy - 30), 15, eyePaint);
+
+    // Smile
+    final smilePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6;
+    canvas.drawArc(Rect.fromCircle(center: center, radius: 70), 0.2 * pi, 0.7 * pi, false, smilePaint);
+
+    // Party hat (triangle)
+    final hatPaint = Paint()..color = Colors.purple;
+    final hat = Path()
+      ..moveTo(center.dx - 60, center.dy - 100)
+      ..lineTo(center.dx + 60, center.dy - 100)
+      ..lineTo(center.dx, center.dy - 200)
+      ..close();
+    canvas.drawPath(hat, hatPaint);
+
+    // Confetti
+    final confettiPaint = Paint()..color = Colors.red;
+    for (int i = 0; i < 10; i++) {
+      final dx = center.dx + Random().nextInt(200) - 100;
+      final dy = center.dy + Random().nextInt(200) - 100;
+      canvas.drawCircle(Offset(dx, dy), 5, confettiPaint..color = Colors.primaries[i % Colors.primaries.length]);
+    }
+  }
+
+  void _drawHeart(Canvas canvas, Offset center) {
+    final heartPaint = Paint()
+      ..shader = LinearGradient(colors: [Colors.red, Colors.pink])
+          .createShader(Rect.fromCircle(center: center, radius: 120))
+      ..style = PaintingStyle.fill;
+
+    final path = Path()
+      ..moveTo(center.dx, center.dy + 40)
+      ..cubicTo(center.dx - 120, center.dy - 40, center.dx - 60, center.dy - 160, center.dx, center.dy - 80)
+      ..cubicTo(center.dx + 60, center.dy - 160, center.dx + 120, center.dy - 40, center.dx, center.dy + 40)
+      ..close();
+    canvas.drawPath(path, heartPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}

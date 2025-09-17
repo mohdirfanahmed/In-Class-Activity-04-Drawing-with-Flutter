@@ -1,0 +1,152 @@
+// main.dart
+// Group Members: [Add your names here]
+
+import 'package:flutter/material.dart';
+import 'dart:math';
+
+void main() {
+  runApp(const EmojiApp());
+}
+
+class EmojiApp extends StatelessWidget {
+  const EmojiApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Emoji Drawing App',
+      theme: ThemeData(
+        useMaterial3: true,
+        primarySwatch: Colors.blue,
+      ),
+      home: const EmojiHomePage(),
+    );
+  }
+}
+
+class EmojiHomePage extends StatefulWidget {
+  const EmojiHomePage({super.key});
+
+  @override
+  State<EmojiHomePage> createState() => _EmojiHomePageState();
+}
+
+class _EmojiHomePageState extends State<EmojiHomePage> {
+  String selectedEmoji = "Party Face";
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Interactive Emoji Drawing"),
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.purpleAccent, Colors.blueAccent],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            DropdownButton<String>(
+              value: selectedEmoji,
+              items: const [
+                DropdownMenuItem(value: "Party Face", child: Text("Party Face 🎉")),
+                DropdownMenuItem(value: "Heart", child: Text("Heart ❤️")),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  selectedEmoji = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Center(
+                child: CustomPaint(
+                  size: const Size(300, 300),
+                  painter: EmojiPainter(selectedEmoji),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class EmojiPainter extends CustomPainter {
+  final String emoji;
+  EmojiPainter(this.emoji);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (emoji == "Party Face") {
+      _drawPartyFace(canvas, size);
+    } else if (emoji == "Heart") {
+      _drawHeart(canvas, size);
+    }
+  }
+
+  void _drawPartyFace(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+
+    // Face
+    final facePaint = Paint()
+      ..shader = RadialGradient(
+        colors: [Colors.yellow.shade200, Colors.orangeAccent],
+      ).createShader(Rect.fromCircle(center: center, radius: 100));
+    canvas.drawCircle(center, 100, facePaint);
+
+    // Eyes
+    final eyePaint = Paint()..color = Colors.black;
+    canvas.drawCircle(Offset(center.dx - 35, center.dy - 20), 12, eyePaint);
+    canvas.drawCircle(Offset(center.dx + 35, center.dy - 20), 12, eyePaint);
+
+    // Smile
+    final smilePaint = Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5;
+    canvas.drawArc(
+      Rect.fromCircle(center: Offset(center.dx, center.dy + 20), radius: 50),
+      0.1 * pi,
+      0.8 * pi,
+      false,
+      smilePaint,
+    );
+
+    // Party Hat (triangle)
+    final hatPaint = Paint()..color = Colors.pinkAccent;
+    final path = Path()
+      ..moveTo(center.dx - 50, center.dy - 100)
+      ..lineTo(center.dx + 50, center.dy - 100)
+      ..lineTo(center.dx, center.dy - 180)
+      ..close();
+    canvas.drawPath(path, hatPaint);
+
+    // Confetti
+    final random = Random();
+    for (int i = 0; i < 20; i++) {
+      final confettiPaint = Paint()
+        ..color = Colors.primaries[random.nextInt(Colors.primaries.length)];
+      canvas.drawCircle(
+        Offset(center.dx - 120 + random.nextDouble() * 240,
+            center.dy - 120 + random.nextDouble() * 240),
+        4,
+        confettiPaint,
+      );
+    }
+  }
+
+  void _drawHeart(Canvas canvas, Size size) {
+    // Heart shape
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}

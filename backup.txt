@@ -1,0 +1,394 @@
+import 'dart:math';
+import 'package:flutter/material.dart';
+
+void main() => runApp(const EmojiDrawApp());
+
+class EmojiDrawApp extends StatelessWidget {
+  const EmojiDrawApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Shapes & Emoji Drawing',
+      theme: ThemeData(useMaterial3: true, colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue)),
+      home: const HomeScreen(),
+    );
+  }
+}
+
+// Add partner names as required by the submission header comment.
+const String collaboratorName = 'Full Collaborator Name Here'; // replace
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+enum EmojiType { partyFace, heart }
+enum GradientMode { none, background, shapes }
+
+class _HomeScreenState extends State<HomeScreen> {
+  EmojiType selected = EmojiType.partyFace;
+  GradientMode gradientMode = GradientMode.background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Shapes & Emoji Drawing'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Task 1: Basic Shapes', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 200,
+            child: CustomPaint(
+              painter: BasicShapesPainter(),
+              size: const Size(double.infinity, 200),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text('Task 2: Combined Shapes (Abstract)', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 300,
+            child: CustomPaint(
+              painter: CombinedShapesPainter(),
+              size: const Size(double.infinity, 300),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text('Task 3: Styled Shapes', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 300,
+            child: CustomPaint(
+              painter: StyledShapesPainter(),
+              size: const Size(double.infinity, 300),
+            ),
+          ),
+          const SizedBox(height: 24),
+          Divider(color: Colors.grey.shade400),
+          const SizedBox(height: 12),
+          Text('Project: Interactive Emoji Drawing', style: Theme.of(context).textTheme.headlineSmall),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: DropdownButtonFormField<EmojiType>(
+                  value: selected,
+                  decoration: const InputDecoration(labelText: 'Emoji', border: OutlineInputBorder()),
+                  items: const [
+                    DropdownMenuItem(value: EmojiType.partyFace, child: Text('Party Face')),
+                    DropdownMenuItem(value: EmojiType.heart, child: Text('Heart')),
+                  ],
+                  onChanged: (v) => setState(() => selected = v ?? EmojiType.partyFace),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<GradientMode>(
+                  value: gradientMode,
+                  decoration: const InputDecoration(labelText: 'Gradient Mode', border: OutlineInputBorder()),
+                  items: const [
+                    DropdownMenuItem(value: GradientMode.none, child: Text('None')),
+                    DropdownMenuItem(value: GradientMode.background, child: Text('Background')),
+                    DropdownMenuItem(value: GradientMode.shapes, child: Text('Shapes')),
+                  ],
+                  onChanged: (v) => setState(() => gradientMode = v ?? GradientMode.background),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Container(
+            height: 360,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: gradientMode == GradientMode.background
+                  ? LinearGradient(colors: [Colors.purple.shade100, Colors.blue.shade100])
+                  : null,
+              color: gradientMode == GradientMode.background ? null : Colors.white,
+              border: Border.all(color: Colors.grey.shade400),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: CustomPaint(
+              painter: EmojiPainter(emoji: selected, gradientShapes: gradientMode == GradientMode.shapes),
+              size: const Size(double.infinity, 360),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text('Tip: Switch emoji and gradients to see dynamic drawing updates.'),
+          const SizedBox(height: 24),
+          Text('Collaborator: $collaboratorName'),
+        ]),
+      ),
+    );
+  }
+}
+
+class BasicShapesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    // Square
+    final squarePaint = Paint()..color = Colors.blue;
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx - 80, cy), width: 60, height: 60), squarePaint);
+
+    // Circle
+    final circlePaint = Paint()..color = Colors.red;
+    canvas.drawCircle(Offset(cx, cy), 30, circlePaint);
+
+    // Arc
+    final arcPaint = Paint()
+      ..color = Colors.green
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5;
+    canvas.drawArc(Rect.fromCenter(center: Offset(cx + 80, cy), width: 60, height: 60), 0, 2.1, false, arcPaint);
+
+    // Rectangle
+    final rectPaint = Paint()..color = Colors.orange;
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx - 160, cy), width: 80, height: 40), rectPaint);
+
+    // Line
+    final linePaint = Paint()
+      ..color = Colors.purple
+      ..strokeWidth = 3;
+    canvas.drawLine(Offset(cx - 200, cy - 50), Offset(cx - 140, cy + 50), linePaint);
+
+    // Oval
+    final ovalPaint = Paint()..color = Colors.teal;
+    canvas.drawOval(Rect.fromCenter(center: Offset(cx + 160, cy), width: 80, height: 40), ovalPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class CombinedShapesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    // Background radial gradient
+    final bgRect = Rect.fromLTWH(0, 0, size.width, size.height);
+    final bgShader = const RadialGradient(
+      center: Alignment.center,
+      radius: 0.8,
+      colors: [Color(0xFFBBDEFB), Colors.white],
+    ).createShader(bgRect);
+    canvas.drawRect(bgRect, Paint()..shader = bgShader);
+
+    // Sun
+    final sunPaint = Paint()..color = Colors.yellow;
+    canvas.drawCircle(Offset(cx, cy - 40), 40, sunPaint);
+
+    // Rays
+    final rayPaint = Paint()
+      ..color = Colors.yellow
+      ..strokeWidth = 3;
+    for (int i = 0; i < 8; i++) {
+      final a = i * (pi / 4);
+      canvas.drawLine(Offset(cx, cy - 40), Offset(cx + cos(a) * 60, cy - 40 + sin(a) * 60), rayPaint);
+    }
+
+    // House body
+    final housePaint = Paint()..color = Colors.brown;
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx, cy + 40), width: 80, height: 80), housePaint);
+
+    // Roof
+    final roofPaint = Paint()..color = Colors.red;
+    final roof = Path()
+      ..moveTo(cx - 60, cy)
+      ..lineTo(cx + 60, cy)
+      ..lineTo(cx, cy - 60)
+      ..close();
+    canvas.drawPath(roof, roofPaint);
+
+    // Door
+    final doorPaint = Paint()..color = Colors.blueGrey;
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx, cy + 60), width: 30, height: 50), doorPaint);
+
+    // Windows
+    final windowPaint = Paint()..color = Colors.lightBlueAccent;
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx - 25, cy + 20), width: 20, height: 20), windowPaint);
+    canvas.drawRect(Rect.fromCenter(center: Offset(cx + 25, cy + 20), width: 20, height: 20), windowPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class StyledShapesPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    // Gradient rectangle
+    final rect = Rect.fromCenter(center: Offset(cx, cy - 100), width: 200, height: 60);
+    final rectShader = const LinearGradient(colors: [Colors.red, Colors.blue]).createShader(rect);
+    canvas.drawRect(rect, Paint()..shader = rectShader);
+
+    // Circle with border
+    final circleCenter = Offset(cx - 80, cy);
+    canvas.drawCircle(circleCenter, 40, Paint()..color = Colors.green);
+    canvas.drawCircle(
+      circleCenter,
+      40,
+      Paint()
+        ..color = Colors.black
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4,
+    );
+
+    // Transparent oval
+    canvas.drawOval(
+      Rect.fromCenter(center: Offset(cx + 80, cy), width: 100, height: 60),
+      Paint()..color = Colors.purple.withOpacity(0.5),
+    );
+
+    // Dashed line (simple path segments)
+    final dashPaint = Paint()
+      ..color = Colors.orange
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke;
+    final double start = cx - 100;
+    double x = start;
+    while (x < cx + 100) {
+      canvas.drawLine(Offset(x, cy + 80), Offset(min(x + 10, cx + 100), cy + 80), dashPaint);
+      x += 15;
+    }
+
+    // Gradient arc
+    final arcRect = Rect.fromCenter(center: Offset(cx, cy + 100), width: 120, height: 120);
+    final arcShader = const SweepGradient(colors: [Colors.red, Colors.yellow, Colors.green]).createShader(arcRect);
+    canvas.drawArc(
+      Rect.fromCenter(center: Offset(cx, cy + 100), width: 100, height: 100),
+      0,
+      2.5,
+      false,
+      Paint()
+        ..shader = arcShader
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 10
+        ..strokeCap = StrokeCap.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class EmojiPainter extends CustomPainter {
+  final EmojiType emoji;
+  final bool gradientShapes;
+
+  EmojiPainter({required this.emoji, required this.gradientShapes});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    switch (emoji) {
+      case EmojiType.partyFace:
+        _drawPartyFace(canvas, size);
+        break;
+      case EmojiType.heart:
+        _drawHeart(canvas, size);
+        break;
+    }
+  }
+
+  void _drawPartyFace(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final faceRadius = 90.0;
+
+    // Face circle (optional gradient)
+    Paint facePaint;
+    if (gradientShapes) {
+      final rect = Rect.fromCircle(center: Offset(cx, cy), radius: faceRadius);
+      final shader = const RadialGradient(colors: [Color(0xFFFFF59D), Color(0xFFFFEB3B)]).createShader(rect);
+      facePaint = Paint()..shader = shader;
+    } else {
+      facePaint = Paint()..color = const Color(0xFFFFEB3B);
+    }
+    canvas.drawCircle(Offset(cx, cy), faceRadius, facePaint);
+
+    // Eyes
+    canvas.drawCircle(Offset(cx - 30, cy - 20), 10, Paint()..color = Colors.black);
+    canvas.drawCircle(Offset(cx + 30, cy - 20), 10, Paint()..color = Colors.black);
+
+    // Smile (arc)
+    final smileRect = Rect.fromCircle(center: Offset(cx, cy + 10), radius: 50);
+    canvas.drawArc(smileRect, pi / 8, pi - pi / 4, false, Paint()
+      ..color = Colors.black
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 6
+      ..strokeCap = StrokeCap.round);
+
+    // Party hat (triangle)
+    final hat = Path()
+      ..moveTo(cx, cy - faceRadius - 10)
+      ..lineTo(cx - 45, cy - 25)
+      ..lineTo(cx + 45, cy - 25)
+      ..close();
+    final hatPaint = Paint()..color = Colors.pinkAccent;
+    canvas.drawPath(hat, hatPaint);
+
+    // Confetti (colorful small shapes)
+    final rnd = Random(42);
+    for (int i = 0; i < 20; i++) {
+      final dx = cx + rnd.nextDouble() * 200 - 100;
+      final dy = cy + rnd.nextDouble() * 160 - 120;
+      final color = Colors.primaries[rnd.nextInt(Colors.primaries.length)];
+      final isCircle = rnd.nextBool();
+      if (isCircle) {
+        canvas.drawCircle(Offset(dx, dy), 4, Paint()..color = color);
+      } else {
+        canvas.drawRect(Rect.fromCenter(center: Offset(dx, dy), width: 6, height: 6), Paint()..color = color);
+      }
+    }
+  }
+
+  void _drawHeart(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2 + 20;
+    final path = Path();
+    final w = 160.0;
+    final h = 140.0;
+
+    // Heart path
+    path.moveTo(cx, cy + h * 0.25);
+    path.cubicTo(cx + w * 0.5, cy - h * 0.35, cx + w, cy + h * 0.4, cx, cy + h);
+    path.cubicTo(cx - w, cy + h * 0.4, cx - w * 0.5, cy - h * 0.35, cx, cy + h * 0.25);
+    path.close();
+
+    Paint heartPaint;
+    if (gradientShapes) {
+      final rect = Rect.fromCenter(center: Offset(cx, cy + h * 0.4), width: w, height: h);
+      final shader = const LinearGradient(colors: [Colors.pink, Colors.red]).createShader(rect);
+      heartPaint = Paint()..shader = shader;
+    } else {
+      heartPaint = Paint()..color = Colors.redAccent;
+    }
+
+    canvas.drawPath(path, heartPaint);
+    canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.black.withOpacity(0.15)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2);
+  }
+
+  @override
+  bool shouldRepaint(covariant EmojiPainter oldDelegate) {
+    return oldDelegate.emoji != emoji || oldDelegate.gradientShapes != gradientShapes;
+  }
+}
