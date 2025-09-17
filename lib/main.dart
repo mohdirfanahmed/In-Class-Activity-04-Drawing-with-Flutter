@@ -144,7 +144,22 @@ class EmojiPainter extends CustomPainter {
   }
 
   void _drawHeart(Canvas canvas, Size size) {
-    // Heart shape
+    // Heart 
+    final center = Offset(size.width / 2, size.height / 2);
+
+    final heartPath = Path();
+    heartPath.moveTo(center.dx, center.dy + 40);
+    heartPath.cubicTo(center.dx + 80, center.dy - 20, center.dx + 40,
+        center.dy - 120, center.dx, center.dy - 40);
+    heartPath.cubicTo(center.dx - 40, center.dy - 120, center.dx - 80,
+        center.dy - 20, center.dx, center.dy + 40);
+
+    final heartPaint = Paint()
+      ..shader = LinearGradient(
+        colors: [Colors.red, Colors.pinkAccent],
+      ).createShader(Rect.fromLTWH(center.dx - 80, center.dy - 120, 160, 160));
+
+    canvas.drawPath(heartPath, heartPaint);
   }
 
   @override
